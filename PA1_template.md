@@ -1,15 +1,11 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 ## Loading and preprocessing the data
 **Show any code that is needed to**
 
 *1. Load the data (i.e. read.csv())*
 
-```{r}
+
+```r
 # Download the data from the original data source and load into data frame
 url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 temp <- tempfile()
@@ -21,7 +17,8 @@ unlink(temp)
 
 *2. Process/transform the data (if necessary) into a format suitable for your analysis*
 
-```{r}
+
+```r
 # Add a timestamp column
 data$time <- sprintf('%04d', data$interval)
 data$time <- sub("([0-9]{2,2})$", ":\\1", data$time)
@@ -34,7 +31,8 @@ data$timestamp <- as.numeric(as.POSIXct(sprintf("%s %s", data$date, data$time)))
 
 *1. Make a histogram of the total number of steps taken each day*
 
-```{r}
+
+```r
 steps_per_day <- aggregate(data$steps, by=list(date=data$date), FUN=sum)
 hist(steps_per_day$x,
    col=c("red"),
@@ -43,20 +41,35 @@ hist(steps_per_day$x,
 	 ylab="Frequency")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 *2. Calculate and report the mean and median total number of steps taken per day*
 
-```{r}
+
+```r
 # Mean
 mean(steps_per_day$x, na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 # Median
 median(steps_per_day$x, na.rm=TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 *1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)*
 
-```{r}
+
+```r
 # First, use aggregate to find the mean.
 activity_pattern <- aggregate(steps ~ interval, data, mean)
 # Now plot a time series
@@ -68,9 +81,12 @@ plot(activity_pattern$interval,
 	 main="Average number of steps taken vs. 5-minute interval")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 *2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?*
 
-```{r} 
+
+```r
 max_interval <- activity_pattern[which.max(activity_pattern$steps), "interval"]
 ```
 
@@ -80,7 +96,8 @@ max_interval <- activity_pattern[which.max(activity_pattern$steps), "interval"]
 
 *1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)*
 
-```{r}
+
+```r
 total_missing_values <- sum(is.na(data$steps))
 ```
 
@@ -90,7 +107,8 @@ Since the instructions explicitly said the strategy does not need to be sophisti
 
 *3. Create a new dataset that is equal to the original dataset but with the missing data filled in.*
 
-```{r}
+
+```r
 new_data <- data
 new_data$steps <- ifelse(is.na(new_data$steps),
 				 activity_pattern$steps,
@@ -99,7 +117,8 @@ new_data$steps <- ifelse(is.na(new_data$steps),
 
 *4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?*
 
-```{r}
+
+```r
 new_steps_per_day <- aggregate(new_data$steps, by=list(date=new_data$date), FUN=sum)
 hist(new_steps_per_day$x,
 	 col=c("red"),
@@ -107,17 +126,43 @@ hist(new_steps_per_day$x,
 	 xlab="Total Steps per Day",
 	 ylab="Frequency")
 ```
-```{r}
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+
+```r
 # New mean
 mean(new_steps_per_day$x, na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 # New median
 median(new_steps_per_day$x, na.rm=TRUE)
 ```
-```{r}
+
+```
+## [1] 10766.19
+```
+
+```r
 # Impact of replacing NA values on mean
 mean(new_steps_per_day$x, na.rm=TRUE) - mean(steps_per_day$x, na.rm=TRUE)
+```
+
+```
+## [1] 0
+```
+
+```r
 # Impact of replacing NA values on median
 median(new_steps_per_day$x, na.rm=TRUE) - median(steps_per_day$x, na.rm=TRUE)
+```
+
+```
+## [1] 1.188679
 ```
 
 As shown above, replacing NA values does not affect the mean, but does affect the median (increasing by roughly 1.2)
@@ -128,7 +173,8 @@ As shown above, replacing NA values does not affect the mean, but does affect th
 
 *1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.*
 
-```{r}
+
+```r
 new_data$weekday <- ifelse(
 	weekdays(as.Date(new_data$date)) %in% c("Saturday", "Sunday"),
 	"weekend",
@@ -138,9 +184,12 @@ new_data$weekday <- as.factor(new_data$weekday)
 
 *2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.*
 
-```{r}
+
+```r
 new_activity_pattern <- aggregate(steps ~ interval+weekday, new_data, mean)
 library(lattice)
 xyplot(steps ~ interval | weekday, new_activity_pattern, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
 
