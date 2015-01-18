@@ -188,7 +188,12 @@ new_data$weekday <- as.factor(new_data$weekday)
 ```r
 new_activity_pattern <- aggregate(steps ~ interval+weekday, new_data, mean)
 library(lattice)
-xyplot(steps ~ interval | weekday, new_activity_pattern, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of steps")
+xyplot(steps ~ interval | weekday,
+       new_activity_pattern,
+       type = "l",
+       layout = c(1, 2),
+       xlab = "Interval",
+       ylab = "Number of steps")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
